@@ -1,7 +1,11 @@
 package edu.stanford.nlp.ling;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import edu.stanford.nlp.ling.CoreAnnotation;
+import edu.stanford.nlp.ling.AnnotationLookup.KeyLookup;
 import edu.stanford.nlp.ling.CoreLabel.GenericAnnotation;
 import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Generics;
@@ -11,83 +15,97 @@ public class AnnotationLookup {
 
   private AnnotationLookup() {}
 
-  public enum KeyLookup {
-    VALUE_KEY(CoreAnnotations.ValueAnnotation.class, OldFeatureLabelKeys.VALUE_KEY),
-    TAG_KEY(CoreAnnotations.PartOfSpeechAnnotation.class, OldFeatureLabelKeys.TAG_KEY),
-    WORD_KEY(CoreAnnotations.TextAnnotation.class, OldFeatureLabelKeys.WORD_KEY),
-    LEMMA_KEY(CoreAnnotations.LemmaAnnotation.class, OldFeatureLabelKeys.LEMMA_KEY),
-    CATEGORY_KEY(CoreAnnotations.CategoryAnnotation.class, OldFeatureLabelKeys.CATEGORY_KEY),
-    PROJ_CAT_KEY(CoreAnnotations.ProjectedCategoryAnnotation.class, OldFeatureLabelKeys.PROJ_CAT_KEY),
-    HEAD_WORD_KEY("edu.stanford.nlp.ling.TreeCoreAnnotations.HeadWordAnnotation", OldFeatureLabelKeys.HEAD_WORD_KEY),
-    HEAD_TAG_KEY("edu.stanford.nlp.ling.TreeCoreAnnotations.HeadTagAnnotation", OldFeatureLabelKeys.HEAD_TAG_KEY),
-    INDEX_KEY(CoreAnnotations.IndexAnnotation.class, OldFeatureLabelKeys.INDEX_KEY),
-    ARG_KEY(CoreAnnotations.ArgumentAnnotation.class, OldFeatureLabelKeys.ARG_KEY),
-    MARKING_KEY(CoreAnnotations.MarkingAnnotation.class, OldFeatureLabelKeys.MARKING_KEY),
-    SEMANTIC_HEAD_WORD_KEY(CoreAnnotations.SemanticHeadWordAnnotation.class, OldFeatureLabelKeys.SEMANTIC_HEAD_WORD_KEY),
-    SEMANTIC_HEAD_POS_KEY(CoreAnnotations.SemanticHeadTagAnnotation.class, OldFeatureLabelKeys.SEMANTIC_HEAD_POS_KEY),
-    VERB_SENSE_KEY(CoreAnnotations.VerbSenseAnnotation.class, OldFeatureLabelKeys.VERB_SENSE_KEY),
-    CATEGORY_FUNCTIONAL_TAG_KEY(CoreAnnotations.CategoryFunctionalTagAnnotation.class, OldFeatureLabelKeys.CATEGORY_FUNCTIONAL_TAG_KEY),
-    NER_KEY(CoreAnnotations.NamedEntityTagAnnotation.class, OldFeatureLabelKeys.NER_KEY),
-    SHAPE_KEY(CoreAnnotations.ShapeAnnotation.class, OldFeatureLabelKeys.SHAPE_KEY),
-    LEFT_TERM_KEY(CoreAnnotations.LeftTermAnnotation.class, OldFeatureLabelKeys.LEFT_TERM_KEY),
-    PARENT_KEY(CoreAnnotations.ParentAnnotation.class, OldFeatureLabelKeys.PARENT_KEY),
-    SPAN_KEY(CoreAnnotations.SpanAnnotation.class, OldFeatureLabelKeys.SPAN_KEY),
-    BEFORE_KEY(CoreAnnotations.BeforeAnnotation.class, OldFeatureLabelKeys.BEFORE_KEY),
-    AFTER_KEY(CoreAnnotations.AfterAnnotation.class, OldFeatureLabelKeys.AFTER_KEY),
-    CURRENT_KEY(CoreAnnotations.OriginalTextAnnotation.class, OldFeatureLabelKeys.CURRENT_KEY),
-    ANSWER_KEY(CoreAnnotations.AnswerAnnotation.class, OldFeatureLabelKeys.ANSWER_KEY),
-    GOLDANSWER_Key(CoreAnnotations.GoldAnswerAnnotation.class, OldFeatureLabelKeys.GOLDANSWER_KEY),
-    FEATURES_KEY(CoreAnnotations.FeaturesAnnotation.class, OldFeatureLabelKeys.FEATURES_KEY),
-    INTERPRETATION_KEY(CoreAnnotations.InterpretationAnnotation.class, OldFeatureLabelKeys.INTERPRETATION_KEY),
-    ROLE_KEY(CoreAnnotations.RoleAnnotation.class, OldFeatureLabelKeys.ROLE_KEY),
-    GAZETTEER_KEY(CoreAnnotations.GazetteerAnnotation.class, OldFeatureLabelKeys.GAZETTEER_KEY),
-    STEM_KEY(CoreAnnotations.StemAnnotation.class, OldFeatureLabelKeys.STEM_KEY),
-    POLARITY_KEY(CoreAnnotations.PolarityAnnotation.class, OldFeatureLabelKeys.POLARITY_KEY),
-    CH_CHAR_KEY(CoreAnnotations.ChineseCharAnnotation.class, OldFeatureLabelKeys.CH_CHAR_KEY),
-    CH_ORIG_SEG_KEY(CoreAnnotations.ChineseOrigSegAnnotation.class, OldFeatureLabelKeys.CH_ORIG_SEG_KEY),
-    CH_SEG_KEY(CoreAnnotations.ChineseSegAnnotation.class, OldFeatureLabelKeys.CH_SEG_KEY),
-    BEGIN_POSITION_KEY(CoreAnnotations.CharacterOffsetBeginAnnotation.class, OldFeatureLabelKeys.BEGIN_POSITION_KEY),
-    END_POSITION_KEY(CoreAnnotations.CharacterOffsetEndAnnotation.class, OldFeatureLabelKeys.END_POSITION_KEY),
-    DOCID_KEY(CoreAnnotations.DocIDAnnotation.class, OldFeatureLabelKeys.DOCID_KEY),
-    SENTINDEX_KEY(CoreAnnotations.SentenceIndexAnnotation.class, OldFeatureLabelKeys.SENTINDEX_KEY),
-    IDF_KEY(CoreAnnotations.IDFAnnotation.class, "idf"),
-    END_POSITION_KEY2(CoreAnnotations.CharacterOffsetEndAnnotation.class, "endPosition"),
-    CHUNK_KEY(CoreAnnotations.ChunkAnnotation.class, "chunk"),
-    NORMALIZED_NER_KEY(CoreAnnotations.NormalizedNamedEntityTagAnnotation.class, "normalized"),
-    MORPHO_NUM_KEY(CoreAnnotations.MorphoNumAnnotation.class,"num"),
-    MORPHO_PERS_KEY(CoreAnnotations.MorphoPersAnnotation.class,"pers"),
-    MORPHO_GEN_KEY(CoreAnnotations.MorphoGenAnnotation.class,"gen"),
-    MORPHO_CASE_KEY(CoreAnnotations.MorphoCaseAnnotation.class,"case"),
-    WORDNET_SYN_KEY(CoreAnnotations.WordnetSynAnnotation.class,"wordnetsyn"),
-    PROTO_SYN_KEY(CoreAnnotations.ProtoAnnotation.class,"proto"),
-    DOCTITLE_KEY(CoreAnnotations.DocTitleAnnotation.class,"doctitle"),
-    DOCTYPE_KEY(CoreAnnotations.DocTypeAnnotation.class,"doctype"),
-    DOCDATE_KEY(CoreAnnotations.DocDateAnnotation.class,"docdate"),
-    DOCSOURCETYPE_KEY(CoreAnnotations.DocSourceTypeAnnotation.class,"docsourcetype"),
-    LINK_KEY(CoreAnnotations.LinkAnnotation.class,"link"),
-    SPEAKER_KEY(CoreAnnotations.SpeakerAnnotation.class,"speaker"),
-    AUTHOR_KEY(CoreAnnotations.AuthorAnnotation.class,"author"),
-    SECTION_KEY(CoreAnnotations.SectionAnnotation.class,"section"),
-    SECTIONID_KEY(CoreAnnotations.SectionIDAnnotation.class,"sectionID"),
-    SECTIONDATE_KEY(CoreAnnotations.SectionDateAnnotation.class,"sectionDate"),
+  public static class KeyLookup {
+    private static List<KeyLookup> values = new LinkedList<KeyLookup>();
+    static {
+      add(CoreAnnotations.ValueAnnotation.class, OldFeatureLabelKeys.VALUE_KEY);
+      add(CoreAnnotations.PartOfSpeechAnnotation.class, OldFeatureLabelKeys.TAG_KEY);
+      add(CoreAnnotations.TextAnnotation.class, OldFeatureLabelKeys.WORD_KEY);
+      add(CoreAnnotations.LemmaAnnotation.class, OldFeatureLabelKeys.LEMMA_KEY);
+      add(CoreAnnotations.CategoryAnnotation.class, OldFeatureLabelKeys.CATEGORY_KEY);
+      add(CoreAnnotations.ProjectedCategoryAnnotation.class, OldFeatureLabelKeys.PROJ_CAT_KEY);
+      add("edu.stanford.nlp.ling.TreeCoreAnnotations.HeadWordAnnotation", OldFeatureLabelKeys.HEAD_WORD_KEY);
+      add("edu.stanford.nlp.ling.TreeCoreAnnotations.HeadTagAnnotation", OldFeatureLabelKeys.HEAD_TAG_KEY);
+      add(CoreAnnotations.IndexAnnotation.class, OldFeatureLabelKeys.INDEX_KEY);
+      add(CoreAnnotations.ArgumentAnnotation.class, OldFeatureLabelKeys.ARG_KEY);
+      add(CoreAnnotations.MarkingAnnotation.class, OldFeatureLabelKeys.MARKING_KEY);
+      add(CoreAnnotations.SemanticHeadWordAnnotation.class, OldFeatureLabelKeys.SEMANTIC_HEAD_WORD_KEY);
+      add(CoreAnnotations.SemanticHeadTagAnnotation.class, OldFeatureLabelKeys.SEMANTIC_HEAD_POS_KEY);
+      add(CoreAnnotations.VerbSenseAnnotation.class, OldFeatureLabelKeys.VERB_SENSE_KEY);
+      add(CoreAnnotations.CategoryFunctionalTagAnnotation.class, OldFeatureLabelKeys.CATEGORY_FUNCTIONAL_TAG_KEY);
+      add(CoreAnnotations.NamedEntityTagAnnotation.class, OldFeatureLabelKeys.NER_KEY);
+      add(CoreAnnotations.ShapeAnnotation.class, OldFeatureLabelKeys.SHAPE_KEY);
+      add(CoreAnnotations.LeftTermAnnotation.class, OldFeatureLabelKeys.LEFT_TERM_KEY);
+      add(CoreAnnotations.ParentAnnotation.class, OldFeatureLabelKeys.PARENT_KEY);
+      add(CoreAnnotations.SpanAnnotation.class, OldFeatureLabelKeys.SPAN_KEY);
+      add(CoreAnnotations.BeforeAnnotation.class, OldFeatureLabelKeys.BEFORE_KEY);
+      add(CoreAnnotations.AfterAnnotation.class, OldFeatureLabelKeys.AFTER_KEY);
+      add(CoreAnnotations.OriginalTextAnnotation.class, OldFeatureLabelKeys.CURRENT_KEY);
+      add(CoreAnnotations.AnswerAnnotation.class, OldFeatureLabelKeys.ANSWER_KEY);
+      add(CoreAnnotations.GoldAnswerAnnotation.class, OldFeatureLabelKeys.GOLDANSWER_KEY);
+      add(CoreAnnotations.FeaturesAnnotation.class, OldFeatureLabelKeys.FEATURES_KEY);
+      add(CoreAnnotations.InterpretationAnnotation.class, OldFeatureLabelKeys.INTERPRETATION_KEY);
+      add(CoreAnnotations.RoleAnnotation.class, OldFeatureLabelKeys.ROLE_KEY);
+      add(CoreAnnotations.GazetteerAnnotation.class, OldFeatureLabelKeys.GAZETTEER_KEY);
+      add(CoreAnnotations.StemAnnotation.class, OldFeatureLabelKeys.STEM_KEY);
+      add(CoreAnnotations.PolarityAnnotation.class, OldFeatureLabelKeys.POLARITY_KEY);
+      add(CoreAnnotations.ChineseCharAnnotation.class, OldFeatureLabelKeys.CH_CHAR_KEY);
+      add(CoreAnnotations.ChineseOrigSegAnnotation.class, OldFeatureLabelKeys.CH_ORIG_SEG_KEY);
+      add(CoreAnnotations.ChineseSegAnnotation.class, OldFeatureLabelKeys.CH_SEG_KEY);
+      add(CoreAnnotations.CharacterOffsetBeginAnnotation.class, OldFeatureLabelKeys.BEGIN_POSITION_KEY);
+      add(CoreAnnotations.CharacterOffsetEndAnnotation.class, OldFeatureLabelKeys.END_POSITION_KEY);
+      add(CoreAnnotations.DocIDAnnotation.class, OldFeatureLabelKeys.DOCID_KEY);
+      add(CoreAnnotations.SentenceIndexAnnotation.class, OldFeatureLabelKeys.SENTINDEX_KEY);
+      add(CoreAnnotations.IDFAnnotation.class, "idf");
+      add(CoreAnnotations.CharacterOffsetEndAnnotation.class, "endPosition");
+      add(CoreAnnotations.ChunkAnnotation.class, "chunk");
+      add(CoreAnnotations.NormalizedNamedEntityTagAnnotation.class, "normalized");
+      add(CoreAnnotations.MorphoNumAnnotation.class,"num");
+      add(CoreAnnotations.MorphoPersAnnotation.class,"pers");
+      add(CoreAnnotations.MorphoGenAnnotation.class,"gen");
+      add(CoreAnnotations.MorphoCaseAnnotation.class,"case");
+      add(CoreAnnotations.WordnetSynAnnotation.class,"wordnetsyn");
+      add(CoreAnnotations.ProtoAnnotation.class,"proto");
+      add(CoreAnnotations.DocTitleAnnotation.class,"doctitle");
+      add(CoreAnnotations.DocTypeAnnotation.class,"doctype");
+      add(CoreAnnotations.DocDateAnnotation.class,"docdate");
+      add(CoreAnnotations.DocSourceTypeAnnotation.class,"docsourcetype");
+      add(CoreAnnotations.LinkAnnotation.class,"link");
+      add(CoreAnnotations.SpeakerAnnotation.class,"speaker");
+      add(CoreAnnotations.AuthorAnnotation.class,"author");
+      add(CoreAnnotations.SectionAnnotation.class,"section");
+      add(CoreAnnotations.SectionIDAnnotation.class,"sectionID");
+      add(CoreAnnotations.SectionDateAnnotation.class,"sectionDate");
 
-    // Thang Sep13: for Genia NER
-    HEAD_KEY(CoreAnnotations.HeadWordStringAnnotation.class, "head"),
-    GOVERNOR_KEY(CoreAnnotations.GovernorAnnotation.class, "governor"),
-    GAZ_KEY(CoreAnnotations.GazAnnotation.class, "gaz"),
-    ABBR_KEY(CoreAnnotations.AbbrAnnotation.class, "abbr"),
-    ABSTR_KEY(CoreAnnotations.AbstrAnnotation.class, "abstr"),
-    FREQ_KEY(CoreAnnotations.FreqAnnotation.class, "freq"),
-    WEB_KEY(CoreAnnotations.WebAnnotation.class, "web"),
+      // Thang Sep13: for Genia NER
+      add(CoreAnnotations.HeadWordStringAnnotation.class, "head");
+      add(CoreAnnotations.GovernorAnnotation.class, "governor");
+      add(CoreAnnotations.GazAnnotation.class, "gaz");
+      add(CoreAnnotations.AbbrAnnotation.class, "abbr");
+      add(CoreAnnotations.AbstrAnnotation.class, "abstr");
+      add(CoreAnnotations.FreqAnnotation.class, "freq");
+      add(CoreAnnotations.WebAnnotation.class, "web");
 
-    // Also have "pos" for PartOfTag (POS is also the TAG_KEY - "tag", but "pos" makes more sense)
-    // Still keep "tag" for POS tag so we don't break anything
-    POS_TAG_KEY(CoreAnnotations.PartOfSpeechAnnotation.class, "pos");
-
+      // Also have "pos" for PartOfTag (POS is also the TAG_KEY - "tag", but "pos" makes more sense)
+      // Still keep "tag" for POS tag so we don't break anything
+      add(CoreAnnotations.PartOfSpeechAnnotation.class, "pos");
+    }
 
     public final Class coreKey;
     public final String oldKey;
+    
+    public static <T> void add(Class<? extends CoreAnnotation<T>> coreKey, String oldKey) {
+      values.add(new KeyLookup(coreKey, oldKey));
+    }
 
+    public static void add(String className, String oldKey) {
+      values.add(new KeyLookup(className, oldKey));
+    }
+
+    public static List<KeyLookup> values() {
+       return values;
+    }
+    
     private <T> KeyLookup(Class<? extends CoreAnnotation<T>> coreKey, String oldKey) {
       this.coreKey = coreKey;
       this.oldKey = oldKey;
