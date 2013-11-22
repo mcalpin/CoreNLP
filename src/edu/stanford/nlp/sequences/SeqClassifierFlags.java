@@ -1,8 +1,11 @@
 package edu.stanford.nlp.sequences;
 
+import edu.stanford.nlp.ling.AnnotationLookup;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.ExtendedAnnotation;
 import edu.stanford.nlp.optimization.StochasticCalculateMethods;
 import edu.stanford.nlp.process.WordShapeClassifier;
+import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.ReflectionLoading;
 
@@ -2518,6 +2521,16 @@ public class SeqClassifierFlags implements Serializable {
         useRandomSeed = Boolean.parseBoolean(val);
       } else if (key.equalsIgnoreCase("terminateOnAvgImprovement")){
         terminateOnAvgImprovement = Boolean.parseBoolean(val);
+      } else if (key.toLowerCase().startsWith("externalannotation")) {
+        try {
+          Class<? extends ExtendedAnnotation<?>> keyClass = 
+            ErasureUtils.uncheckedCast(Class.forName(val));
+          AnnotationLookup.KeyLookup.add(val, keyClass.newInstance().getTextKey());
+        } catch (Exception ex) {
+          throw new RuntimeException("Failed to instantiate extended annotation " 
+            + val + ". Class must extend ExtendedAnnotation and have a public no "
+            + "arg constructor", ex);
+        }
 
         // ADD VALUE ABOVE HERE
       } else if (key.length() > 0 && !key.equals("prop")) {
