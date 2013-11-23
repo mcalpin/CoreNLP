@@ -1023,6 +1023,8 @@ public class SeqClassifierFlags implements Serializable {
   public transient List<String> phraseGazettes = null;
   public transient Properties props = null;
 
+  public List<ExtendedAnnotation<?>> externalAnnotations = new ArrayList<ExtendedAnnotation<?>>();
+
   public SeqClassifierFlags() {
   }
 
@@ -2527,7 +2529,9 @@ public class SeqClassifierFlags implements Serializable {
         try {
           Class<? extends ExtendedAnnotation<?>> keyClass = 
             ErasureUtils.uncheckedCast(Class.forName(val));
-          AnnotationLookup.KeyLookup.add(val, keyClass.newInstance().getTextKey());
+          ExtendedAnnotation externalAnnotation = keyClass.newInstance();
+          externalAnnotations.add(externalAnnotation);
+          AnnotationLookup.KeyLookup.add(val, externalAnnotation.getTextKey());
         } catch (Exception ex) {
           throw new RuntimeException("Failed to instantiate extended annotation " 
             + val + ". Class must exist in the classpath, must implement "
