@@ -2521,6 +2521,8 @@ public class SeqClassifierFlags implements Serializable {
         useRandomSeed = Boolean.parseBoolean(val);
       } else if (key.equalsIgnoreCase("terminateOnAvgImprovement")){
         terminateOnAvgImprovement = Boolean.parseBoolean(val);
+
+        // ADD VALUE ABOVE HERE
       } else if (key.toLowerCase().startsWith("externalannotation")) {
         try {
           Class<? extends ExtendedAnnotation<?>> keyClass = 
@@ -2528,11 +2530,9 @@ public class SeqClassifierFlags implements Serializable {
           AnnotationLookup.KeyLookup.add(val, keyClass.newInstance().getTextKey());
         } catch (Exception ex) {
           throw new RuntimeException("Failed to instantiate extended annotation " 
-            + val + ". Class must extend ExtendedAnnotation and have a public no "
-            + "arg constructor", ex);
+            + val + ". Class must exist in the classpath, must implement "
+            + "ExtendedAnnotation and must have a public no arg constructor", ex);
         }
-
-        // ADD VALUE ABOVE HERE
       } else if (key.length() > 0 && !key.equals("prop")) {
         System.err.println("Unknown property: |" + key + '|');
       }
